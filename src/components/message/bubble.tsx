@@ -1,17 +1,26 @@
 import { use$ } from "@legendapp/state/react";
-import { memo } from "react";
+import { memo, useEffect } from "react";
 import MessageAvatar from "@/components/message/avatar";
 import MessageContent from "@/components/message/content/main";
 import type { MessageType } from "@/database/schemas/message";
 import streamStore$ from "@/stores/stream";
 
-// Memoized so that when a new message is added to the parent list, this component will not rerender
 const MessageBubble = memo(function MessageBubble({
   role,
   content,
   isStreaming,
-}: Omit<MessageType, "id">) {
+  scrollToBottom,
+}: Omit<MessageType, "id"> & {
+  scrollToBottom: () => void;
+}) {
   const streamingContent = use$(streamStore$);
+
+  useEffect(() => {
+    if (isStreaming && streamingContent.trim() !== "") {
+      scrollToBottom();
+    }
+  }, [isStreaming, scrollToBottom, streamingContent]);
+
   return (
     <div className="flex w-full gap-x-2">
       <MessageAvatar role={role} />

@@ -1,4 +1,4 @@
-import { streamText } from "ai";
+import { smoothStream, streamText } from "ai";
 import { v7 as uuid } from "uuid";
 import PromptEditor from "@/components/prompt/editor";
 import PromptOptions from "@/components/prompt/options";
@@ -9,7 +9,7 @@ import inputDisablingStore$ from "@/stores/input-disabling";
 import promptStore$ from "@/stores/prompt";
 import streamStore$ from "@/stores/stream";
 
-function PromptContainer() {
+function Prompt() {
   async function handleSend() {
     const prompt = promptStore$.get();
     if (prompt.trim() === "") return;
@@ -25,6 +25,8 @@ function PromptContainer() {
     };
     await db.messages.add(userMessage);
 
+    const messages = await db.messages.toArray();
+
     const aiMessage: MessageType = {
       id: uuid(),
       role: "assistant",
@@ -33,13 +35,16 @@ function PromptContainer() {
     };
     await db.messages.add(aiMessage);
 
-    const messages = await db.messages.toArray();
     const { fullStream } = streamText({
       model: gemini,
       messages,
       providerOptions: {
         google: googleProviderOptions,
       },
+      experimental_transform: smoothStream({
+        delayInMs: 15,
+        chunking: "word",
+      }),
     });
 
     let streamContent: string = "";
@@ -68,7 +73,10 @@ function PromptContainer() {
       streamStore$.set(streamContent);
     }
 
-    console.error("Errors:", error);
+    if (error.length > 0) {
+      console.error("Errors:", error);
+    }
+
     await db.messages.update(aiMessage.id, {
       content: streamContent,
       isStreaming: false,
@@ -86,4 +94,4 @@ function PromptContainer() {
   );
 }
 
-export default PromptContainer;
+export default Prompt;

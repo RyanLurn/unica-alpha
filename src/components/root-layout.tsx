@@ -5,7 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 function RootLayout() {
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <main className="h-screen w-screen overflow-y-auto">
+      <main className="h-screen w-screen">
         <Outlet />
       </main>
       <div className="fixed top-2 right-2">

@@ -9,6 +9,7 @@ const google = createGoogleGenerativeAI({
 });
 
 const geminiFlash = google("gemini-2.5-flash", {
+  useSearchGrounding: true,
   safetySettings: [
     { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
     { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },

@@ -63,6 +63,14 @@ function Prompt() {
           streamContent += "</think>";
           isThinking = false;
         }
+      } else if (streamPart.type === "source") {
+        console.log(streamPart.source);
+        continue;
+      } else if (streamPart.type === "finish") {
+        console.log("Finish reason:", streamPart.finishReason);
+        console.log("Usage:", streamPart.usage);
+        console.log("Provider metadata:", streamPart.providerMetadata);
+        continue;
       } else if (streamPart.type === "error") {
         error.push(streamPart.error);
         continue;
@@ -77,15 +85,15 @@ function Prompt() {
     if (error.length > 0) {
       toast.error("Errors occurred. Check the console for details.");
       console.error("Errors:", error);
-      streamContent = "Errors occurred. Check the console for details.";
+      streamContent = "Something went wrong while generating the response.";
+    } else {
+      toast.success("Response generated successfully.");
     }
 
     await db.messages.update(aiMessage.id, {
       content: streamContent,
       isStreaming: false,
     });
-
-    toast.success("Response generated successfully.");
 
     streamStore$.set("");
     inputDisablingStore$.set(false);

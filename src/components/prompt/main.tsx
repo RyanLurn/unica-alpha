@@ -1,10 +1,11 @@
 import { smoothStream, streamText } from "ai";
+import { toast } from "sonner";
 import { v7 as uuid } from "uuid";
 import PromptEditor from "@/components/prompt/editor";
 import PromptOptions from "@/components/prompt/options";
 import db from "@/database/connection";
 import type { MessageType } from "@/database/schemas/message";
-import { gemini, googleProviderOptions } from "@/lib/ai/model";
+import { geminiFlash, googleProviderOptions } from "@/lib/ai/model";
 import inputDisablingStore$ from "@/stores/input-disabling";
 import promptStore$ from "@/stores/prompt";
 import streamStore$ from "@/stores/stream";
@@ -36,7 +37,7 @@ function Prompt() {
     await db.messages.add(aiMessage);
 
     const { fullStream } = streamText({
-      model: gemini,
+      model: geminiFlash,
       messages,
       providerOptions: {
         google: googleProviderOptions,
@@ -74,7 +75,9 @@ function Prompt() {
     }
 
     if (error.length > 0) {
+      toast.error("Errors occurred. Check the console for details.");
       console.error("Errors:", error);
+      streamContent = "Errors occurred. Check the console for details.";
     }
 
     await db.messages.update(aiMessage.id, {

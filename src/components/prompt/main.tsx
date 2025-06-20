@@ -5,7 +5,7 @@ import PromptEditor from "@/components/prompt/editor";
 import PromptOptions from "@/components/prompt/options";
 import db from "@/database/connection";
 import type { MessageType } from "@/database/schemas/message";
-import { geminiFlash, googleProviderOptions } from "@/lib/ai/model";
+import { geminiFlash, googleProviderOptions } from "@/lib/ai/models/google";
 import inputDisablingStore$ from "@/stores/input-disabling";
 import promptStore$ from "@/stores/prompt";
 import streamStore$ from "@/stores/stream";
@@ -84,6 +84,8 @@ function Prompt() {
       content: streamContent,
       isStreaming: false,
     });
+
+    toast.success("Response generated successfully.");
 
     streamStore$.set("");
     inputDisablingStore$.set(false);
